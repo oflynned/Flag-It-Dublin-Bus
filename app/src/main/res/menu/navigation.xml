@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_rti"
+        android:icon="@drawable/ic_rti"
+        android:title="RTI" />
+
+    <item
+        android:id="@+id/navigation_planner"
+        android:icon="@drawable/ic_planner"
+        android:title="Planner" />
+
+    <item
+        android:id="@+id/navigation_timetables"
+        android:icon="@drawable/ic_timetables"
+        android:title="Timetables" />
+
+    <item
+        android:id="@+id/navigation_news"
+        android:icon="@drawable/ic_news"
+        android:title="News" />
+
+</menu>

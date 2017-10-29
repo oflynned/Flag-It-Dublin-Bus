@@ -1,6 +1,11 @@
-<resources>
-    <string name="app_name">Real Time Dublin</string>
+<resources xmlns:android="http://schemas.android.com/tools">
+    <string name="app_name">Flag It! Dublin Bus</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+
+    <string name="maps_api_key">AIzaSyBqCjzPMKdmNJWUgOIOwZsRGePIRcBgtNI</string>
+
+    <string name="CONSUMER_KEY" android:name="com.twitter.sdk.android.CONSUMER_KEY">QsWwynVQCIMDHWsCsxl2e5nAA</string>
+    <string name="CONSUMER_SECRET" android:name="com.twitter.sdk.android.CONSUMER_SECRET">8CgXubcRRIpfFpR4wwVQDZ5zQLzQToiI5NWOnSvddAAp99Uatf</string>
 </resources>

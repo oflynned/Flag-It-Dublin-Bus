@@ -1,4 +1,4 @@
-package com.syzible.realtimedublin;
+package com.syzible.flagitdublinbus;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

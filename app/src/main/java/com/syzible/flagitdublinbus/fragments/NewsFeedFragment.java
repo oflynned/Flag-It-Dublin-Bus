@@ -1,4 +1,4 @@
-package com.syzible.realtimedublin.fragments;
+package com.syzible.flagitdublinbus.fragments;
 
 import android.app.Fragment;
 import android.os.Bundle;
@@ -9,8 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.syzible.realtimedublin.R;
-import com.twitter.sdk.android.core.models.Tweet;
+import com.syzible.flagitdublinbus.R;
 import com.twitter.sdk.android.tweetui.TweetTimelineRecyclerViewAdapter;
 import com.twitter.sdk.android.tweetui.UserTimeline;
 

@@ -1,4 +1,4 @@
-package com.syzible.realtimedublin;
+package com.syzible.flagitdublinbus;
 
 import org.junit.Test;
 

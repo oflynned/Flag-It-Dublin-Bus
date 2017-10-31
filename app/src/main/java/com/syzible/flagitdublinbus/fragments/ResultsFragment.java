@@ -19,6 +19,7 @@ import com.syzible.flagitdublinbus.R;
 import com.syzible.flagitdublinbus.networking.Endpoints;
 import com.syzible.flagitdublinbus.networking.RestClient;
 import com.syzible.flagitdublinbus.objects.Bus;
+import com.syzible.flagitdublinbus.objects.StopPoint;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,6 +36,7 @@ import cz.msebera.android.httpclient.Header;
 
 public class ResultsFragment extends Fragment {
 
+    private int stopId;
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private ArrayList<Bus> results = new ArrayList<>();
@@ -51,7 +53,7 @@ public class ResultsFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
 
-        endpoint = Endpoints.getRealtimeInfo(47);
+        endpoint = Endpoints.getRealtimeInfo(stopId);
         loadData();
 
         swipeRefreshLayout = view.findViewById(R.id.card_container_layout);
@@ -59,6 +61,10 @@ public class ResultsFragment extends Fragment {
 
 
         return view;
+    }
+
+    public void setStopId(int id) {
+        this.stopId = id;
     }
 
     private void loadData() {

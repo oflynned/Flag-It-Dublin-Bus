@@ -21,9 +21,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.flagitdublinbus.R;
+import com.syzible.flagitdublinbus.activities.MainActivity;
 import com.syzible.flagitdublinbus.networking.Endpoints;
 import com.syzible.flagitdublinbus.networking.RestClient;
 import com.syzible.flagitdublinbus.objects.StopPoint;
@@ -133,6 +135,13 @@ public class RealTimeFragment extends Fragment implements OnMapReadyCallback {
                                         .snippet(s.getAddress())
                                         .position(s.getLocation()));
                     }
+
+                    googleMap.setOnMarkerClickListener(marker -> {
+                        ResultsFragment resultsFragment = new ResultsFragment();
+                        resultsFragment.setStopId(Integer.parseInt(marker.getTitle()));
+                        MainActivity.setFragmentBackstack(getFragmentManager(), resultsFragment);
+                        return false;
+                    });
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

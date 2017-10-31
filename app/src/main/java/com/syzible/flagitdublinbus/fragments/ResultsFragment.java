@@ -1,9 +1,12 @@
 package com.syzible.flagitdublinbus.fragments;
 
 import android.app.Fragment;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -35,6 +38,9 @@ public class ResultsFragment extends Fragment {
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private ArrayList<Bus> results = new ArrayList<>();
+    private SwipeRefreshLayout swipeRefreshLayout;
+
+    private String endpoint;
 
     @Nullable
     @Override
@@ -45,7 +51,17 @@ public class ResultsFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
 
-        String endpoint = Endpoints.getRealtimeInfo(47);
+        endpoint = Endpoints.getRealtimeInfo(47);
+        loadData();
+
+        swipeRefreshLayout = view.findViewById(R.id.card_container_layout);
+        swipeRefreshLayout.setOnRefreshListener(this::loadData);
+
+
+        return view;
+    }
+
+    private void loadData() {
         RestClient.get(endpoint, new BaseJsonHttpResponseHandler<JSONArray>() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
@@ -62,11 +78,12 @@ public class ResultsFragment extends Fragment {
 
                 adapter = new BusAdapter(getActivity(), results);
                 recyclerView.setAdapter(adapter);
+                swipeRefreshLayout.setRefreshing(false);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONArray errorResponse) {
-
+                swipeRefreshLayout.setRefreshing(false);
             }
 
             @Override
@@ -74,8 +91,6 @@ public class ResultsFragment extends Fragment {
                 return new JSONObject(rawJsonData).getJSONArray("results");
             }
         });
-
-        return view;
     }
 
     public class BusAdapter extends RecyclerView.Adapter<BusAdapter.ViewHolder> {
@@ -83,13 +98,14 @@ public class ResultsFragment extends Fragment {
         private Context context;
 
         class ViewHolder extends RecyclerView.ViewHolder {
-            TextView timeTextView, terminusTextView, routeTextView;
+            TextView timeTextView, terminusTextView, routeTextView, minsTextView;
 
             ViewHolder(View v) {
                 super(v);
                 this.timeTextView = v.findViewById(R.id.due);
                 this.terminusTextView = v.findViewById(R.id.terminus);
                 this.routeTextView = v.findViewById(R.id.route);
+                this.minsTextView = v.findViewById(R.id.due_mins_text);
             }
         }
 
@@ -110,6 +126,7 @@ public class ResultsFragment extends Fragment {
             holder.timeTextView.setText(String.valueOf(bus.getMinsUntilBus()));
             holder.terminusTextView.setText(String.valueOf(bus.getEnTerminus()));
             holder.routeTextView.setText(String.valueOf(bus.getRoute()));
+            holder.minsTextView.setText(bus.getMinsUntilBus() == 1 ? "min" : "mins");
         }
 
         @Override

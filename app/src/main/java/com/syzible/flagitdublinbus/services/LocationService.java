@@ -19,10 +19,13 @@ import com.syzible.flagitdublinbus.networking.Endpoints;
 public class LocationService extends Service {
 
     public static final LatLng START_LOCATION = new LatLng(53.3471471, -6.2605128);
-    public static final float START_ZOOM = 10f;
+    public static final float START_ZOOM = 10.0f;
+    public static final float CLOSE_ZOOM = 15.0f;
 
     private static final int LOCATION_FOREGROUND_INTERVAL = Endpoints.isDebugMode() ? Constants.ONE_SECOND : Constants.FIVE_MINUTES;
     private static final float LOCATION_DISTANCE = 200f;
+
+    public static final String LOCATION_CHANGE_FILTER = "com.syzible.flagitdublinbus.location_change";
 
     private LocationManager locationManager = null;
 
@@ -37,7 +40,11 @@ public class LocationService extends Service {
         @Override
         public void onLocationChanged(Location location) {
             lastLocation.set(location);
-            System.out.println(lastLocation);
+
+            Intent intent = new Intent(LOCATION_CHANGE_FILTER);
+            intent.putExtra("lat", String.valueOf(location.getLatitude()));
+            intent.putExtra("lng", String.valueOf(location.getLongitude()));
+            getApplicationContext().sendBroadcast(intent);
         }
 
         @Override

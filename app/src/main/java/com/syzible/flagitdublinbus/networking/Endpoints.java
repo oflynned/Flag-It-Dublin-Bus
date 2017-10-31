@@ -16,11 +16,11 @@ public class Endpoints {
         return "https://www.dublinbus.ie/Templates/Public/RoutePlannerService/RTPIMapHandler.ashx" +
                 "?ne=" + ne.latitude + "," + ne.longitude +
                 "&sw=" + sw.latitude + "," + sw.longitude + "&zoom=" + zoom +
-                "&czoom=16&_=" + System.currentTimeMillis();
+                "&czoom=" + zoom + "&_=" + System.currentTimeMillis();
     }
 
     public static String getRealtimeInfo(int stopId) {
-        return  "https://data.dublinked.ie/cgi-bin/rtpi/realtimebusinformation?stopid=" + stopId;
+        return "https://data.dublinked.ie/cgi-bin/rtpi/realtimebusinformation?stopid=" + stopId;
     }
 
     public static boolean isDebugMode() {

@@ -8,28 +8,36 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.flagitdublinbus.R;
+import com.syzible.flagitdublinbus.networking.Endpoints;
+import com.syzible.flagitdublinbus.networking.RestClient;
+import com.syzible.flagitdublinbus.objects.StopPoint;
 import com.syzible.flagitdublinbus.services.LocationService;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+
+import cz.msebera.android.httpclient.Header;
 
 import static com.syzible.flagitdublinbus.services.LocationService.START_LOCATION;
 import static com.syzible.flagitdublinbus.services.LocationService.START_ZOOM;
@@ -43,10 +51,11 @@ public class RealTimeFragment extends Fragment implements OnMapReadyCallback {
     private boolean hasZoomedIn = false;
     private LatLng lastLocation;
 
+    private List<StopPoint> busStops = new ArrayList<>();
+
     private BroadcastReceiver onLocationChange = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            System.out.println("Received broadcast!");
             if (Objects.equals(intent.getAction(), LocationService.LOCATION_CHANGE_FILTER)) {
                 if (googleMap != null) {
                     float lat = Float.parseFloat(intent.getStringExtra("lat"));
@@ -58,6 +67,8 @@ public class RealTimeFragment extends Fragment implements OnMapReadyCallback {
                                 lastLocation, LocationService.CLOSE_ZOOM));
                         hasZoomedIn = true;
                     }
+
+                    renderPointsToMap();
                 }
             }
         }
@@ -95,6 +106,50 @@ public class RealTimeFragment extends Fragment implements OnMapReadyCallback {
         return view;
     }
 
+    private void renderPointsToMap() {
+        LatLng ne = googleMap.getProjection().getVisibleRegion().latLngBounds.northeast;
+        LatLng sw = googleMap.getProjection().getVisibleRegion().latLngBounds.southwest;
+        float zoom = googleMap.getCameraPosition().zoom;
+
+        System.out.println(Endpoints.getMapsLocations(ne, sw, zoom));
+
+        RestClient.get(Endpoints.getMapsLocations(ne, sw, zoom), new BaseJsonHttpResponseHandler<JSONObject>() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                try {
+                    googleMap.clear();
+                    busStops.clear();
+
+                    JSONArray points = response.getJSONArray("points");
+                    for (int i = 0; i < points.length(); i++) {
+                        StopPoint stop = new StopPoint(points.getJSONObject(i));
+                        busStops.add(stop);
+                    }
+
+                    for (StopPoint s : busStops) {
+                        googleMap.addMarker(
+                                new MarkerOptions()
+                                        .title(String.valueOf(s.getId()))
+                                        .snippet(s.getAddress())
+                                        .position(s.getLocation()));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+
+            }
+
+            @Override
+            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                return new JSONObject(rawJsonData);
+            }
+        });
+    }
+
     @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -104,7 +159,7 @@ public class RealTimeFragment extends Fragment implements OnMapReadyCallback {
         if (isLocationAllowed()) {
             this.googleMap.setMyLocationEnabled(true);
             this.googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-            //this.googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom());
+            this.googleMap.setOnCameraChangeListener(cameraPosition -> renderPointsToMap());
         }
     }
 

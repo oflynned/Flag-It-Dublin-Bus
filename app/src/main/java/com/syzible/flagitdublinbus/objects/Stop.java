@@ -7,6 +7,7 @@ import org.json.JSONObject;
  */
 
 public class Stop {
+    private String stopAddress;
     private int stage, stopId;
     private boolean isInbound;
     private String[] availableRoutes;
@@ -15,11 +16,16 @@ public class Stop {
 
     }
 
-    public Stop(int stage, int stopId, boolean isInbound, String[] availableRoutes) {
+    public Stop(int stage, String stopAddress, int stopId, boolean isInbound, String[] availableRoutes) {
         this.stage = stage;
+        this.stopAddress = stopAddress;
         this.stopId = stopId;
         this.isInbound = isInbound;
         this.availableRoutes = availableRoutes;
+    }
+
+    public String getStopAddress() {
+        return stopAddress;
     }
 
     public int getStage() {
